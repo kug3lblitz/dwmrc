@@ -47,17 +47,17 @@
 	#fi
 #}
 
-#print_wifi() {
-	#ip=$(ip route get 8.8.8.8 2>/dev/null|grep -Eo 'src [0-9.]+'|grep -Eo '[0-9.]+')
+print_wifi() {
+    ip=$(ip route get 8.8.8.8 2>/dev/null|grep -Eo 'src [0-9.]+'|grep -Eo '[0-9.]+')
 
-	#if hash iw
-	#then
-		#wifi=$(iw wlp4s0 link | grep SSID | sed 's,.*SSID: ,,')
-		#connectedto=$(iw wlp4s0 link | grep Connected | awk '{print $3}' | cut -c 10-)
-	#fi
+    #if hash iw
+    #then
+        #wifi=$(iw wlp4s0 link | grep SSID | sed 's,.*SSID: ,,')
+        #connectedto=$(iw wlp4s0 link | grep Connected | awk '{print $3}' | cut -c 10-)
+    #fi
 
-	#echo -e "$wifi $connectedto $ip"
-#}
+    echo -e "$wifi $connectedto $ip"
+}
 
 print_mem(){
 	memfree=$(($(grep -m1 'MemAvailable:' /proc/meminfo | awk '{print $2}') / 1024))
@@ -70,20 +70,7 @@ print_temp(){
 }
 
 print_bat(){
-    hash acpi || return 0
-	onl="$(grep "on-line" <(acpi -V))"
-	charge="$(awk '{ sum += $1 } END { print sum }' /sys/class/power_supply/BAT*/capacity)"
-    echo -e "${charge}"
-    #if test -z "$onl"
-    #then
-        ## suspend when we close the lid
-        #systemctl --user stop inhibit-lid-sleep-on-battery.service
-        #echo -e "${charge}"
-    #else
-        ## On mains! no need to suspend
-        #systemctl --user start inhibit-lid-sleep-on-battery.service
-        #echo -e "${charge}"
-    #fi
+    $(acpi -v)
 }
 
 print_date(){
@@ -94,11 +81,11 @@ while true
 do
 
 	# Get new transmitted, received byte number values and current time
-	get_bytes
+	#get_bytes
 
 	# Calculates speeds
-	vel_recv=$(get_velocity $received_bytes $old_received_bytes $now)
-	vel_trans=$(get_velocity $transmitted_bytes $old_transmitted_bytes $now)
+	#vel_recv=$(get_velocity $received_bytes $old_received_bytes $now)
+	#vel_trans=$(get_velocity $transmitted_bytes $old_transmitted_bytes $now)
 
 	xsetroot -name "$(print_mem) $vel_recv $vel_trans $(print_temp) $(print_wifi) $(print_bat) $(test -f /tmp/r2d2 && cat /tmp/r2d2) $(print_date)"
 
